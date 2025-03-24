@@ -98,7 +98,7 @@ public class OVcard {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.YEAR, 5);
 
-        java.util.Date expirationDate = cal.getTime();
+        Date expirationDate = cal.getTime();
         
         dateEnd = expirationDate;
 		return dateEnd;
@@ -142,9 +142,11 @@ public class OVcard {
 		checkCardBalance();
 		if (cardBalanceB == true) {
 			changeStatus();
+			getStartPoint(stationName);
+			System.out.println("Checked in on station: "+ startPoint);
 		}
-		getStartPoint(stationName);
-		System.out.println("Checked in on station: "+ startPoint);
+		
+		
 	}
 }
 
