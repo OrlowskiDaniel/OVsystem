@@ -21,7 +21,7 @@ public class Main {
 		cardUsed = true;
 		if (cardUsed == true) {
 			CheckPoint i = new CheckPoint(stationName);
-			i.checkIn();
+			card.checkIn(i.name);
 		}
 		
 	}

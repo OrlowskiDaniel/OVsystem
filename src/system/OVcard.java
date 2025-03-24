@@ -22,6 +22,7 @@ public class OVcard {
 	double cardBalance = 0;
 	
 	//Card Status
+	boolean cardBalanceB = false;
 	int statusNow = 1;
 	int faildToCheckOut = 0;
 	
@@ -51,8 +52,20 @@ public class OVcard {
 			break;
 		case CHECKOUT:
 			statusNow = 0;
+			System.out.println("You are Checked In");
 			break;
 		}
+	}
+	public boolean checkCardBalance() {
+		cardBalanceB = false;
+		if (cardBalance > 5) {
+			cardBalanceB = true;
+		}
+		else {
+			System.out.println("Not enough balance!");
+		}
+		
+		return cardBalanceB;
 	}
 	
 	
@@ -125,6 +138,14 @@ public class OVcard {
 		System.out.print("ID:  "+cardID+"\nYour Name:  "+ name+"\nCreation date:  "+ dateStart+"\nExpiration date:  "+ dateEnd+"\nBank Connection:  "+ bankCn+"\nCard Balance:  "+ cardBalance);
 	}
 	
+	public void checkIn(String stationName) {
+		checkCardBalance();
+		if (cardBalanceB == true) {
+			changeStatus();
+		}
+		getStartPoint(stationName);
+		System.out.println("Checked in on station: "+ startPoint);
+	}
 }
 
 
