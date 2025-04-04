@@ -1,34 +1,57 @@
 package system;
 
-import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import system.OVcard.Status;
 
 public class CheckPoint {
 	
-	public ArrayList<String> stationName = new ArrayList<String>();
-	public ArrayList<Integer> stationId = new ArrayList<Integer>();
-	public int id;
-	public String name;
+	private int id;
+	private String name;
+	private double kmMark;
+	static AtomicInteger nextId = new AtomicInteger();
 	
-	public CheckPoint() {
-		stationName.add("Nijemgen");
-		stationName.add("Nijemgen Lent");
-		stationName.add("Nijemgen Heyendaal");
-		stationName.add("Nijemgen Dukenburg");
-		stationName.add("Nijemgen Goffert");
-		stationName.add("Wijchen");
+	public CheckPoint(String name, double kmMark) {
+		this.name = name;
+		this.kmMark = kmMark;
+		id = nextId.incrementAndGet() - 1;
 		
 	}
-	public void getStationName(String name) {
-		this.name = name;
+	
+	public String getStationName() {
+		return name;
+	}
+
+	public int getID() {
+		return id;
 	}
 	
-	public void printStationList() {
-		System.out.println("\n\nStation List: ");
-		for (int i = 0; i < stationName.size(); i++) {
-			System.out.println(stationName.get(i));
+	public double getKmMarker() {
+		return kmMark;
+	}
+	
+	public void printNameAndId() {
+		System.out.println("   "+id+" - "+name);
+	}
+	
+	public void checkIn(OVcard card) {
+		if (card.checkCardBalance() == true && card.checkDateValid() == true) {
+			if (card.getStatus() == Status.CHECKIN) {
+				System.out.println("You are already Checked In");
+			}
+			else {
+				card.changeStatus();
+				card.getStartPointkmMark(kmMark);
+				System.out.println("Checked In on station: "+ name);
+			}
 		}
 	}
-	public void getID() {
+	public void checkOut(OVcard card, BankAccount bank) {
+		card.changeStatus();
+		System.out.println("Checked Out on station: "+ name);
+		
+		card.transaction(bank);
+		
 		
 	}
 	
