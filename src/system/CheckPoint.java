@@ -9,6 +9,8 @@ public class CheckPoint {
 	private int id;
 	private String name;
 	private double kmMark;
+	private double pricePerKm = 0.20;
+	private double standartTicketPrice = 2.50;
 	static AtomicInteger nextId = new AtomicInteger();
 	
 	public CheckPoint(String name, double kmMark) {
@@ -50,7 +52,7 @@ public class CheckPoint {
 		card.changeStatus();
 		System.out.println("Checked Out on station: "+ name);
 		
-		card.transaction(bank);
+		card.transaction(bank, standartTicketPrice, pricePerKm);
 		
 		
 	}

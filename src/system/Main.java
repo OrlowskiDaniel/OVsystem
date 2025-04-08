@@ -7,6 +7,8 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
+		
+		
 		OVcard card = new OVcard();
 		BankAccount bankAccount = new BankAccount(2000);
 		
@@ -20,7 +22,7 @@ public class Main {
 		};
 		
 		
-		card.makeNewCard(bankAccount);
+		card.addBalance(bankAccount);
 		card.printCardInfo();
 		
 		
@@ -31,21 +33,23 @@ public class Main {
 		
 		while(true) {
 			System.out.println("\n\nWhere do you want to use card(Use Station Number): ");
-			
+			int test = 0;
+			test+=1;
 			try {
 				int stationID = sc.nextInt();
 				card.cardUsed(i[stationID], card, bankAccount);
 				
-				
-				if (stationID == 100) {
-					break;
-				}
+		
 				}
 			catch (ArrayIndexOutOfBoundsException | java.util.InputMismatchException e) {
 				System.err.println("Choose only existing station");
+				sc.nextLine();
 				
 			}
-		
+			if (test == 30) {
+				break;
+			}
+			
 		}
 		
 		

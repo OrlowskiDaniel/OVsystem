@@ -14,7 +14,6 @@ public class OVcard {
 	private String name;
 	private Date dateStart;
 	private Date dateEnd;
-	private boolean bankConn = false;
 	private boolean cardValid = true;
 	
 	//Ride info
@@ -31,11 +30,11 @@ public class OVcard {
 	
 	private Scanner sc = new Scanner(System.in);
 	private Date date = new Date();
-	static AtomicInteger nextId = new AtomicInteger();
+	private AtomicInteger nextId = new AtomicInteger();
 	
 	//Constructor
 	public OVcard() {
-		
+		makeNewCard();
 	}
 	
 	
@@ -59,6 +58,14 @@ public class OVcard {
 			System.out.println("You are Checked In");
 			break;
 		}
+		if (cardStatus == Status.CHECKIN) {
+			long start = System.currentTimeMillis();
+			long end = start + 30 * 1000;
+			while (System.currentTimeMillis() > end) {
+			    changeStatus();
+			}
+		}
+		
 	}
 	public Status getStatus() {
 		return cardStatus;
@@ -70,7 +77,7 @@ public class OVcard {
 			cardMinimBalance = true;
 		}
 		else {
-			System.out.println("Not enough balance!");
+			System.out.println("Not enough balance on card!");
 		}
 		
 		return cardMinimBalance;
@@ -78,19 +85,16 @@ public class OVcard {
 	
 	
 	
-	public void makeNewCard(BankAccount bank) {
+	public void makeNewCard() {
 		System.out.println("Make your OV-card.");
 		
 		cardID = nextId.incrementAndGet();
 		// name card
 		setName();
-		
+		// card date 
 		dateStart = date;
 		getEndDate();
 		
-		bankConnection();
-		
-		addBalance(bank);
 	}
 	
 	public String getName() {
@@ -126,17 +130,7 @@ public class OVcard {
 		return cardValid;
 	}
 	
-	
-	public boolean bankConnection() {
-		System.out.println("Do you wish to connect your bank to the card(Yes or No): ");
-		String userInput = sc.next();
-		if (userInput.equalsIgnoreCase("yes")) {
-			bankConn = true;
-		}
 
-		return bankConn;
-	}
-	
 	
 	// Ride Information 
 	public void getStartPointkmMark(double s) {
@@ -146,6 +140,7 @@ public class OVcard {
 		endPoint = s;
 	}
 	
+	
 	// Card Balance
 	public void addBalance(BankAccount bank) {
 		System.out.println("Your current balance (least 4 euro to Check In): "+ cardBalance);
@@ -153,17 +148,17 @@ public class OVcard {
 		System.out.println("How much balance you wish to add: ");
 		double depositAmout = sc.nextDouble();
 		if (bank.getSaldo() > depositAmout) {
-			// add balance from bank account
+			bank.processPayment(depositAmout);
+			cardBalance = depositAmout + cardBalance;
 		}
 		else {
-			System.out.println("Not enough money in the bank account");
+			System.err.println("Not enough money in the bank account");
 		}
-		cardBalance = depositAmout + cardBalance;
 	}
 	
 	public void printCardInfo() {
 		System.out.println("\nYour card Information: ");
-		System.out.print("ID:  "+cardID+"\nYour Name:  "+ name+"\nCreation date:  "+ dateStart+"\nExpiration date:  "+ dateEnd+"\nBank Connection:  "+ bankConn+"\nCard Balance:  "+ cardBalance);
+		System.out.print("ID:  "+cardID+"\nYour Name:  "+ name+"\nCreation date:  "+ dateStart+"\nExpiration date:  "+ dateEnd+"\nCard Balance:  "+ cardBalance);
 	}
 	
 	
@@ -198,30 +193,17 @@ public class OVcard {
 	}
 	
 	
-	
-	public void transaction(BankAccount bank) {
-		calcDistance();
-		double price = priceCalc();
-		if (price > cardBalance || bankConn == true) {
-			takeFromBank(bank, price);
-		}
-		else {
-			updateBalance(price);
-		}
-		
-	}
-	
 	public double calcDistance() {
 		double distance = Math.abs(startPoint - endPoint);
 		return distance;
 	}
-	public double priceCalc() {
+	public double priceCalc(double standartTicketPrice, double pricePerKm) {
 		double distance = calcDistance();
-		double price = 2.5 + (distance * 0.20);
+		double price = standartTicketPrice + (distance * pricePerKm);
 		System.out.println("Distance of the ride: "+ distance+" km");
 		return price;
 	}
-	public void updateBalance(double price) {
+	public void updateCardBalance(double price) {
 		System.out.println("Price you have to pay: €"+ price);
 		cardBalance = cardBalance - price;
 		System.out.println("Your new balance: "+ cardBalance);
@@ -231,6 +213,21 @@ public class OVcard {
 		bank.processPayment(price);
 	}
 	
+	
+	public void transaction(BankAccount bank, double standartTicketPrice, double pricePerKm) {
+		calcDistance();
+		double price = priceCalc(standartTicketPrice, pricePerKm);
+		if (price > cardBalance) {
+			takeFromBank(bank, price);
+		}
+		else if(price < cardBalance) {
+			updateCardBalance(price);
+		}
+		else {
+			System.err.println("Error: Can't pay");
+		}
+		
+	}
 	
 }
 
