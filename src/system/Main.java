@@ -8,7 +8,6 @@ public class Main {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
 		
-		
 		OVcard card = new OVcard();
 		BankAccount bankAccount = new BankAccount(2000);
 		
@@ -37,7 +36,7 @@ public class Main {
 			test+=1;
 			try {
 				int stationID = sc.nextInt();
-				card.cardUsed(i[stationID], card, bankAccount);
+				card.useCard(i[stationID], card, bankAccount);
 				
 		
 				}

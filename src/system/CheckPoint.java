@@ -36,20 +36,21 @@ public class CheckPoint {
 		System.out.println("   "+id+" - "+name);
 	}
 	
-	public void checkIn(OVcard card) {
-		if (card.checkCardBalance() == true && card.checkDateValid() == true) {
+	public void checkIn(OVcard card, BankAccount bank) {
+		if (card.checkCardMininumBalance() == true && card.checkDateValid() == true) {
 			if (card.getStatus() == Status.CHECKIN) {
 				System.out.println("You are already Checked In");
 			}
 			else {
-				card.changeStatus();
-				card.getStartPointkmMark(kmMark);
+				card.changeStatus(bank);
+				card.setStartPointkmMark(kmMark);
 				System.out.println("Checked In on station: "+ name);
 			}
 		}
 	}
 	public void checkOut(OVcard card, BankAccount bank) {
-		card.changeStatus();
+		card.changeStatus(bank);
+		card.setEndPoint(kmMark);
 		System.out.println("Checked Out on station: "+ name);
 		
 		card.transaction(bank, standartTicketPrice, pricePerKm);
