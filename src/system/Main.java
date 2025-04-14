@@ -8,7 +8,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
 		
-		OVcard card = new OVcard();
+		OVcard card = new OVcard(sc);
 		BankAccount bankAccount = new BankAccount(2000);
 		
 		CheckPoint[] i = {
@@ -31,14 +31,21 @@ public class Main {
         }
 		
 		while(true) {
-			System.out.println("\n\nWhere do you want to use card(Use Station Number): ");
+			
 			int test = 0;
 			test+=1;
 			try {
-				int stationID = sc.nextInt();
-				card.useCard(i[stationID], card, bankAccount);
 				
-		
+				if (card.isPenaltyToPay()) {
+				    card.payPenalty(bankAccount);
+				}
+				else {
+					System.out.println("\n\nWhere do you want to use card(Use Station Number): ");
+					int stationID = sc.nextInt();
+					card.useCard(i[stationID], bankAccount);
+				}
+				
+				
 				}
 			catch (ArrayIndexOutOfBoundsException | java.util.InputMismatchException e) {
 				System.err.println("Choose only existing station");

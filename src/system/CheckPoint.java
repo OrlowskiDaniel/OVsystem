@@ -13,6 +13,12 @@ public class CheckPoint {
 	private double standartTicketPrice = 2.50;
 	static AtomicInteger nextId = new AtomicInteger();
 	
+	// check point
+	// kmMarker is used to calculate distance of the ride
+	// you can check in and check out here
+	
+	
+	
 	public CheckPoint(String name, double kmMark) {
 		this.name = name;
 		this.kmMark = kmMark;
@@ -43,14 +49,17 @@ public class CheckPoint {
 			}
 			else {
 				card.changeStatus(bank);
-				card.setStartPointkmMark(kmMark);
+				card.setStartPoint(kmMark, name);
 				System.out.println("Checked In on station: "+ name);
 			}
+		}
+		else {
+			System.err.println("error");
 		}
 	}
 	public void checkOut(OVcard card, BankAccount bank) {
 		card.changeStatus(bank);
-		card.setEndPoint(kmMark);
+		card.setEndPoint(kmMark, name);
 		System.out.println("Checked Out on station: "+ name);
 		
 		card.transaction(bank, standartTicketPrice, pricePerKm);
