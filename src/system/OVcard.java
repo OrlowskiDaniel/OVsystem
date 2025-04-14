@@ -40,6 +40,7 @@ public class OVcard {
 	// Using timer and timer task to update failed to check out variable
     private Timer timer = new Timer();
     private TimerTask autoCheckout;
+    // if you failed to check out 8 times you have to pay penalty
     private int failedToCheckOut = 7;
     private double standartPrice = 2.5;
     private double penalyPrice = 10;
@@ -47,6 +48,7 @@ public class OVcard {
     
 	
 	private final AtomicInteger nextId = new AtomicInteger();
+	// the scanner from main
 	private Scanner sc;
 	
 	//Constructor
@@ -125,6 +127,9 @@ public class OVcard {
 	public Status getStatus() {
 		return cardStatus;
 	}
+	
+	// clearing ride info to solve a system logic problem
+	// Fixed: when checking in and previous station was the same you coudn't check in
 	private void clearRideInfo() {
 		stationNameStart = null;
 		stationNameEnd= null;
@@ -135,7 +140,9 @@ public class OVcard {
 	// if the user is in CHECKIN state for to long system will change it back to CHECKOUT and add +1 to faildToCheckOut variable
     private void scheduleAutoCheckOut(BankAccount bank) {
         cancelAutoCheckOut(); // clear previous timer
-
+        
+        // making new timer task 
+        // using override for the compiler to see the method is from timer task
         autoCheckout = new TimerTask() {
         	@Override
             public void run() {
@@ -148,17 +155,19 @@ public class OVcard {
                 }
             }
         };
-
+        
+        // beginning timer 
+        // after the time have passed execute run
         timer.schedule(autoCheckout, 30 * 1000); // 30 seconds
     }   
     
     // penalty you have to pay if you forget to check out 8 times
-    public boolean isPenaltyToPay() {
+    public boolean getPenaltyToPay() {
         return penaltyToPay;
     }
     public void payPenalty(BankAccount bank) {
     	System.out.println("You forget to check out to many times: "+failedToCheckOut);
-    	System.out.println("Your penalty: "+ penalyPrice);
+    	System.out.println("Your penalty: €"+ penalyPrice);
     	failedToCheckOut = 0;
     	while (true) {
             if (cardBalance > penalyPrice) {
@@ -191,6 +200,7 @@ public class OVcard {
 		return false;
 	}
 	
+	// add balance to card
 	public void addBalance(BankAccount bank) {
 		System.out.println("Your current balance (least 4 euro to Check In): "+ cardBalance);
 		
@@ -205,6 +215,7 @@ public class OVcard {
 		}
 	}
 	
+	// update balance on card
 	public void updateCardBalance(double price) {
 		System.out.println("Price you have to pay: €"+ price);
 		cardBalance = cardBalance - price;
@@ -214,7 +225,7 @@ public class OVcard {
     
 	
 	
-	// Ride Information and fare calculation
+	// Ride Information
 	public void setStartPoint(double km, String sName) {
 		this.startPoint = km;
 		this.stationNameStart = sName;
@@ -224,21 +235,27 @@ public class OVcard {
 		this.endPoint = km;
 		this.stationNameEnd = sName;
 	}
+	
+	// calculate distance by subtracting the mark of start point from and point and make in absolute
 	public double calcDistance() {
 		double distance = Math.abs(startPoint - endPoint);
 		return distance;
 	}
+	
+	// calculate fare
 	public double priceCalc(double standartTicketPrice, double pricePerKm) {
 		double distance = calcDistance();
 		double price = standartTicketPrice + (distance * pricePerKm);
 		System.out.println("Distance of the ride: "+ distance+" km");
 		return price;
 	}
+	
+	//  transaction
 	public void transaction(BankAccount bank, double standartTicketPrice, double pricePerKm) {
 		double price = priceCalc(standartTicketPrice, pricePerKm);
 		if(price < cardBalance) {
 			updateCardBalance(price);
-			// System.out.println(stationNameStart+"\n"+stationNameEnd);
+			// For testing: System.out.println(stationNameStart+"\n"+stationNameEnd);
 			clearRideInfo();
 		}
 		else {
@@ -249,21 +266,26 @@ public class OVcard {
 		
 	public void useCard(CheckPoint s, BankAccount bankAcc) {
 		
-			if (cardStatus == Status.CHECKOUT) {
+			if (cardStatus == Status.CHECKOUT && penaltyToPay == false) {
 				// valid check in
 				s.checkIn(this, bankAcc);
 			}
 			else if (cardStatus == Status.CHECKIN) {
 				// already checked in
 				if (stationNameStart.equals(s.getStationName())) {
-					// check in again at the same station — not allowed
+					// check in again at the same station is not allowed
 					s.checkIn(this, bankAcc);
 					return;
 				}
 				else {
-					// Valid check-out attempt
+					// valid check-out attempt
 					s.checkOut(this, bankAcc);
 				}
+			}
+			else if (penaltyToPay == true) {
+				//
+				payPenalty(bankAcc);
+				
 			}
 			
 		}

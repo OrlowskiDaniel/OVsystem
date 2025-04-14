@@ -35,16 +35,10 @@ public class Main {
 			int test = 0;
 			test+=1;
 			try {
-				
-				if (card.isPenaltyToPay()) {
-				    card.payPenalty(bankAccount);
-				}
-				else {
-					System.out.println("\n\nWhere do you want to use card(Use Station Number): ");
-					int stationID = sc.nextInt();
-					card.useCard(i[stationID], bankAccount);
-				}
-				
+			
+				System.out.println("\n\nWhere do you want to use card(Use Station Number): ");
+				int stationID = sc.nextInt();
+				card.useCard(i[stationID], bankAccount);
 				
 				}
 			catch (ArrayIndexOutOfBoundsException | java.util.InputMismatchException e) {
